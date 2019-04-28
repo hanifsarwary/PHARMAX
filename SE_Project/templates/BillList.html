@@ -1,0 +1,215 @@
+{% extends 'base1.html'%}
+
+{% block content %}
+
+<style>
+body {font-family: Arial, Helvetica, sans-serif;}
+* {box-sizing: border-box;}
+
+/* Button used to open the contact form - fixed at the bottom of the page */
+.open-button {
+  background-color: #555;
+  color: Blue;
+  padding: 16px 20px;
+  border: none;
+  cursor: pointer;
+  opacity: 0.8;
+  position: fixed;
+  bottom: 23px;
+  right: 28px;
+  width: 280px;
+}
+
+/* The popup form - hidden by default */
+.form-popup {
+  display: none;
+  position: fixed;
+  bottom: 0;
+  right: 15px;
+  border: 3px solid #f1f1f1;
+  z-index: 9;
+}
+
+/* Add styles to the form container */
+.form-container {
+  max-width: 300px;
+  padding: 10px;
+  background-color: white;
+}
+
+/* Full-width input fields */
+.form-container input[type=text], .form-container input[type=password] {
+  width: 100%;
+  padding: 15px;
+  margin: 5px 0 22px 0;
+  border: none;
+  background: #f1f1f1;
+}
+
+/* When the inputs get focus, do something */
+.form-container input[type=text]:focus, .form-container input[type=password]:focus {
+  background-color: #ddd;
+  outline: none;
+}
+
+/* Set a style for the submit/login button */
+.form-container .btn {
+  background-color: #4CAF50;
+  color: white;
+  padding: 16px 20px;
+  border: none;
+  cursor: pointer;
+  width: 100%;
+  margin-bottom:10px;
+  opacity: 0.8;
+}
+
+/* Add a red background color to the cancel button */
+.form-container .cancel {
+  background-color: red;
+}
+
+/* Add some hover effects to buttons */
+.form-container .btn:hover, .open-button:hover {
+  opacity: 1;
+}
+</style>
+<script>
+
+
+function searchFunction()
+{
+  var input, filter, table, tr, td, i, txtValue;
+  /*validating data entry*/
+  input = document.getElementById("myInput");
+  filter = input.value.toUpperCase();
+
+  table = document.getElementById("myTable");
+  tr = table.getElementsByTagName("tr");
+
+  for (i = 0; i < tr.length; i++)
+  {
+    td = tr[i].getElementsByTagName("td")[0];
+    if (td)
+    {
+      txtValue = td.innerText;
+      if (txtValue.toUpperCase().indexOf(filter) > -1)
+      {
+        tr[i].style.display = "";
+      }
+      else
+      {
+        tr[i].style.display = "none";
+      }
+    }
+  }
+}
+
+
+function ajaxfunction(){
+var name = document.getElementById("heading");
+var loc = document.getElementById("location");
+var pack = document.getElementById("pack");
+var ppl = document.getElementById("ppl");
+var plt = document.getElementById("plt");
+$.ajax({
+            method: 'GET',
+            url: '{% url "Inventory:inventoryupdate" %}',
+            data: {
+                name: ''+name.innerHTML,
+                location:''+loc.value,
+                packet:''+pack.value,
+                ppl:''+ppl.value,
+                plt:''+plt.value,
+
+            },
+            dataType : 'json',
+            success:function(g){
+            alert('item is updated');
+            }
+        });
+}
+
+
+function ajaxfunction1(){
+var name = document.getElementById("medname");
+var loc = document.getElementById("location1");
+var pack = document.getElementById("pack1");
+var ppl = document.getElementById("max_ppl1");
+var plt = document.getElementById("max_plt1");
+$.ajax({
+            method: 'POST',
+            url: '{% url "Inventory:inventoryadd" %}',
+            data: {
+                name: ''+name.value,
+                location:''+loc.value,
+                packet:pack.value,
+                ppl:ppl.value,
+                plt:plt.value,
+                csrfmiddlewaretoken: '{{ csrf_token }}',
+
+            },
+            dataType : 'json',
+            success:function(g){
+            alert(g.success);
+            window.location.href="{% url 'Inventory:inventoryView' user.username %}";
+            }
+        });
+}
+</script>
+        <nav class="navbar navbar-light navbar-expand-md navigation-clean">
+            <div class="container"><a class="navbar-brand" href="#">Pharmax</a><button class="navbar-toggler" data-toggle="collapse" data-target="#navcol-1"><span class="sr-only">Toggle navigation</span><span class="navbar-toggler-icon"></span></button>
+     <div class="collapse navbar-collapse"
+                    id="navcol-1">
+                    {% if user.designation == 's'%}
+                     <ul class="nav navbar-nav ml-auto">
+                        <li class="nav-item" role="presentation"><a class="nav-link" href="{% url 'Inventory:inventoryView' user.username %}">Inventory</a></li>
+                        <li class="nav-item" role="presentation"><a class="nav-link" href="{% url 'Inventory:billView' user.username %} ">Bill</a></li>
+                        <li class="nav-item" role="presentation">
+                            <a class="nav-link" href="{%url 'Inventory:logoutView'%}">Log out</a></li>
+                    </ul>
+                    {%else %}
+
+                    <ul class="nav navbar-nav ml-auto">
+                        <li class="nav-item" role="presentation"><a class="nav-link" href="{% url 'Inventory:inventoryView' user.username %}">Inventory</a></li>
+                        <li class="nav-item" role="presentation"><a class="nav-link" href="{% url 'Inventory:transferView'  user.username %}">Request Transfer</a></li>
+                        <li class="nav-item" role="presentation"><a class="nav-link" href="{% url 'Inventory:requestlistView' user.username %}">Pending Requests</a></li>
+                        <li class="nav-item" role="presentation"><a class="nav-link" href="{% url 'Inventory:salesmenView' user.username %}">Sales Men</a></li>
+                        <li class="nav-item" role="presentation"><a class="nav-link" href="{% url 'Inventory:billView' user.username%}"> Generate Bill</a></li>
+                        <li class="nav-item" role="presentation"><a class="nav-link" href="{% url 'Inventory:medicineView' user.username %}">Medicine</a></li>
+                        <li class="nav-item" role="presentation"><a class="nav-link" href="{%url 'Inventory:logoutView'%}">Log out</a></li>
+                    </ul>
+                    {% endif %}
+                </div>
+            </div>
+        </nav><input id="myInput" onkeyup="searchFunction()"class="form-control-lg flex-grow-1" type="search" name="Search" placeholder="Search" maxlength="20" minlength="3" autofocus="" style="margin:12px;"></div>
+    <div class="table-responsive m-auto">
+        <table class="table" id="myTable">
+            <thead>
+                <tr>
+                    <th>Bill Id</th>
+                    <th>Bill Date</th>
+                    <th>Customer Name</th>
+
+
+                </tr>
+            </thead>
+            <tbody>
+            {% for inven in bills %}
+                <tr class='clickable-row'>
+                    <td>{{inven.id}}</td>
+                    <td>{{inven.date}}</td>
+                    <td>{{inven.name}}</td>
+
+                    <<td><button class="btn btn-primary" onclick="window.location.href='{% url 'Inventory:requestDetailView' user.username inven.id %}'" >Details</button></td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+
+    </div><button class="btn btn-primary" onclick="window.location.href='{% url 'Inventory:billView' user.username %}" type="button" >Add Item</button>
+
+
+
+
+{% endblock %}

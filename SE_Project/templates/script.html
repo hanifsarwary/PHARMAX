@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<body>
+
+<h2>Data Sheet</h2>
+
+<input type="text" id="myInput" onkeyup="myFunction()" placeholder="Enter Query" title="Type in a name">
+
+<table id="myTable">
+  <tr class="header">
+    <th style="width:60%;">Name</th>
+    <th style="width:40%;">Country</th>
+  </tr>
+  <tr>
+    <td>Rulid</td>
+    <td>Germany</td>
+  </tr>
+  <tr>
+    <td>Pepsi</td>
+    <td>Sweden</td>
+  </tr>
+  <tr>
+    <td>Coffee</td>
+    <td>UK</td>
+  </tr>
+  <tr>
+    <td>Pnadol</td>
+    <td>Germany</td>
+  </tr>
+  <tr>
+    <td>O2</td>
+    <td>Canada</td>
+  </tr>
+  <tr>
+    <td>Marijuana</td>
+    <td>Italy</td>
+  </tr>
+  <tr>
+    <td>Cigrette</td>
+    <td>UK</td>
+  </tr>
+</table>
+
+<script>
+function myFunction()
+{
+  var input, filter, table, tr, td, i, txtValue;
+  /*validating data entry*/
+  input = document.getElementById("myInput");
+  filter = input.value.toUpperCase();
+
+  table = document.getElementById("myTable");
+  tr = table.getElementsByTagName("tr");
+
+  for (i = 0; i < tr.length; i++)
+  {
+    td = tr[i].getElementsByTagName("td")[0];
+    if (td)
+    {
+      txtValue = td.innerText;
+      if (txtValue.toUpperCase().indexOf(filter) > -1)
+      {
+        tr[i].style.display = "";
+      }
+      else
+      {
+        tr[i].style.display = "none";
+      }
+    }
+  }
+}
+</script>
+
+</body>
+</html>

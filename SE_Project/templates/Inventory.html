@@ -1,0 +1,316 @@
+{% extends 'base1.html'%}
+
+{% block content %}
+
+<style>
+body {font-family: Arial, Helvetica, sans-serif;}
+* {box-sizing: border-box;}
+
+/* Button used to open the contact form - fixed at the bottom of the page */
+.open-button {
+  background-color: #555;
+  color: Blue;
+  padding: 16px 20px;
+  border: none;
+  cursor: pointer;
+  opacity: 0.8;
+  position: fixed;
+  bottom: 23px;
+  right: 28px;
+  width: 280px;
+}
+
+/* The popup form - hidden by default */
+.form-popup {
+  display: none;
+  position: fixed;
+  bottom: 0;
+  right: 15px;
+  border: 3px solid #f1f1f1;
+  z-index: 9;
+}
+
+/* Add styles to the form container */
+.form-container {
+  max-width: 300px;
+  padding: 10px;
+  background-color: white;
+}
+
+/* Full-width input fields */
+.form-container input[type=text], .form-container input[type=password] {
+  width: 100%;
+  padding: 15px;
+  margin: 5px 0 22px 0;
+  border: none;
+  background: #f1f1f1;
+}
+
+/* When the inputs get focus, do something */
+.form-container input[type=text]:focus, .form-container input[type=password]:focus {
+  background-color: #ddd;
+  outline: none;
+}
+
+/* Set a style for the submit/login button */
+.form-container .btn {
+  background-color: #4CAF50;
+  color: white;
+  padding: 16px 20px;
+  border: none;
+  cursor: pointer;
+  width: 100%;
+  margin-bottom:10px;
+  opacity: 0.8;
+}
+
+/* Add a red background color to the cancel button */
+.form-container .cancel {
+  background-color: red;
+}
+
+/* Add some hover effects to buttons */
+.form-container .btn:hover, .open-button:hover {
+  opacity: 1;
+}
+</style>
+<script>
+function alphanumeric(inputtxt)
+{
+var letters = /^[0-9a-zA-Z]+$/;
+if(inputtxt.value.match(letters))
+{
+return true;
+}
+else{
+return false;
+}
+}
+function openForm(name) {
+    document.getElementById("myForm").style.display = "block";
+    var s = document.getElementById("heading");
+    s.innerHTML = name;
+}
+
+function closeForm() {
+    document.getElementById("myForm").style.display = "none";
+}
+
+function openForm1() {
+    document.getElementById("myForm1").style.display = "block";
+
+}
+
+function closeForm1() {
+    document.getElementById("myForm1").style.display = "none";
+}
+
+
+function searchFunction()
+{
+  var input, filter, table, tr, td, i, txtValue;
+  /*validating data entry*/
+  input = document.getElementById("myInput");
+  filter = input.value.toUpperCase();
+
+  table = document.getElementById("myTable");
+  tr = table.getElementsByTagName("tr");
+
+  for (i = 0; i < tr.length; i++)
+  {
+    td = tr[i].getElementsByTagName("td")[0];
+    if (td)
+    {
+      txtValue = td.innerText;
+      if (txtValue.toUpperCase().indexOf(filter) > -1)
+      {
+        tr[i].style.display = "";
+      }
+      else
+      {
+        tr[i].style.display = "none";
+      }
+    }
+  }
+}
+
+
+
+function ajaxfunction(){
+var name = document.getElementById("heading");
+var loc = document.getElementById("location");
+var pack = document.getElementById("pack");
+var ppl = document.getElementById("ppl");
+var plt = document.getElementById("plt");
+if(loc.value!=""){
+if (pack.value >0 && ppl.value >0 && plt.value>0){
+$.ajax({
+            method: 'GET',
+            url: '{% url "Inventory:inventoryupdate" %}',
+            data: {
+                name: name.innerHTML,
+                location:loc.value,
+                packet:pack.value,
+                ppl:ppl.value,
+                plt:plt.value,
+
+            },
+            dataType : 'json',
+            success:function(g){
+            alert('item is updated');
+             window.location.href="{% url 'Inventory:inventoryView' user.username %}";
+            }
+        });
+ }
+ else{
+ alert("all numbers must be greater than 0");
+ }
+
+}
+else{
+alert("location field can not be blank");
+}
+}
+
+
+function ajaxfunction1(){
+var name = document.getElementById("medname");
+var loc = document.getElementById("location1");
+var pack = document.getElementById("pack1");
+var ppl = document.getElementById("max_ppl1");
+var plt = document.getElementById("max_plt1");
+if(name.value =="0" || loc.value==""){
+alert("must choose a medicine name and enter a location");
+}
+else{
+if (pack.value >0 && ppl.value >0 && plt.value>0){
+$.ajax({
+            method: 'POST',
+            url: '{% url "Inventory:inventoryadd" %}',
+            data: {
+                name: ''+name.value,
+                location:''+loc.value,
+                packet:pack.value,
+                ppl:ppl.value,
+                plt:plt.value,
+                csrfmiddlewaretoken: '{{ csrf_token }}',
+
+            },
+            dataType : 'json',
+            success:function(g){
+            window.location.href="{% url 'Inventory:inventoryView' user.username %}";
+            }
+        });
+}
+else{
+alert('all numbers should be non negative');
+}
+}
+}
+</script>
+        <nav class="navbar navbar-light navbar-expand-md navigation-clean">
+            <div class="container"><a class="navbar-brand" href="#">Pharmax</a><button class="navbar-toggler" data-toggle="collapse" data-target="#navcol-1"><span class="sr-only">Toggle navigation</span><span class="navbar-toggler-icon"></span></button>
+                <div class="collapse navbar-collapse"
+                    id="navcol-1">
+                    {% if user.designation == 's'%}
+                     <ul class="nav navbar-nav ml-auto">
+                        <li class="nav-item" role="presentation"><a class="nav-link" href="{% url 'Inventory:inventoryView' user.username %}">Inventory</a></li>
+                        <li class="nav-item" role="presentation"><a class="nav-link" href="{% url 'Inventory:billView' user.username %} ">Bill</a></li>
+                        <li class="nav-item" role="presentation">
+                            <a class="nav-link" href="{%url 'Inventory:logoutView'%}">Log out</a></li>
+                    </ul>
+                    {%else %}
+
+                    <ul class="nav navbar-nav ml-auto">
+                        <li class="nav-item" role="presentation"><a class="nav-link" href="{% url 'Inventory:inventoryView' user.username %}">Inventory</a></li>
+                        <li class="nav-item" role="presentation"><a class="nav-link" href="{% url 'Inventory:transferView'  user.username %}">Request Transfer</a></li>
+                        <li class="nav-item" role="presentation"><a class="nav-link" href="{% url 'Inventory:requestlistView' user.username %}">Pending Requests</a></li>
+                        <li class="nav-item" role="presentation"><a class="nav-link" href="{% url 'Inventory:salesmenView' user.username %}">Sales Men</a></li>
+                        <li class="nav-item" role="presentation"><a class="nav-link" href="{% url 'Inventory:billView' user.username%}"> Generate Bill</a></li>
+                        <li class="nav-item" role="presentation"><a class="nav-link" href="{% url 'Inventory:medicineView' user.username %}">Medicine</a></li>
+                        <li class="nav-item" role="presentation"><a class="nav-link" href="{%url 'Inventory:logoutView'%}">Log out</a></li>
+                    </ul>
+                    {% endif %}
+                </div>
+            </div>
+        </nav><input id="myInput" onkeyup="searchFunction()"class="form-control-lg flex-grow-1" type="search" name="Search" placeholder="Search" maxlength="20" minlength="3" autofocus="" style="margin:12px;"></div>
+    <div class="table-responsive m-auto">
+        <table class="table" id="myTable">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Location</th>
+                    <th>Syrup/Tablet</th>
+                    <th>Packets/Bottles</th>
+                    <th>Tablets</th>
+                    <th>Per Pakcet Leafs</th>
+                    <th>Per Leaf Tablet</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for inven in inventory %}
+                <tr class='clickable-row'>
+                    <td>{{inven.med_id.name}}</td>
+                    <td>{{inven.location}}</td>
+                    <td>{{inven.med_id.category}}</td>
+                    <td>{{inven.packet_count}}</td>
+                    <td>{{inven.tablet_count}}</td>
+                    <td>{{inven.max_leaf_count}}</td>
+                    <td>{{inven.max_tablet_count}}</td>
+                    <td><button onclick="openForm('{{inven.med_id.name}}')" >update</button></td>
+                    <!--<td><button onclick="window.location.href='{% url 'Inventory:deleteInventoryView' inven.med_id.name %}'">Delete</button></td>-->
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+
+    </div><button class="btn btn-primary" type="button" onclick="openForm1()">Add Item</button>
+
+<div class="form-popup" id="myForm">
+  <form class="form-container">
+    <h1 id ="heading"></h1>
+
+    <label><b>Location</b></label>
+    <input type="text" placeholder="Enter location" id="location" >
+
+    <label><b>packets</b></label>
+    <input type="number" placeholder="Enter number of packets" id="pack" required>
+     <label><b>Enter maximum number of leaves in a packet</b></label>
+    <input type="number" placeholder="Enter leaf in a packet" id="ppl" required>
+       <label><b>Enter maximum number of tablets in a leaf</b></label>
+    <input type="number" placeholder="Enter number of tablets in a leaf" id="plt" required>
+    <button type="button" class="btn" onclick="ajaxfunction()">Update</button>
+    <button type="button" class="btn cancel" onclick="closeForm()">Close</button>
+  </form>
+</div>
+
+
+<div class="form-popup" id="myForm1">
+  <form class="form-container">
+    {% csrf_token %}
+    <select name="medicine" id="medname">
+        <option value="0">-----</option>
+        {%for med in medicine%}
+    <option value="{{med}}">{{med}}</option>
+        {%endfor%}
+    </select>
+<br>
+    <label><b>Location</b></label>
+    <input type="text" value="" placeholder="Enter location" id="location1" >
+      <br>
+    <label><b>Enter maximum number of leaves in a packet</b></label>
+    <input type="number" value="0" placeholder="only positive numbers" id="max_ppl1">
+      <br>
+      <label><b>Enter maximum number of tablets in a leaf</b></label>
+    <input type="number" value="0" placeholder="only positive numbers" id="max_plt1">
+      <br>
+      <label><b>packets</b></label>
+      <br>
+    <input type="number" value="0" placeholder="Enter number of packets in Inventory" id="pack1">
+
+    <button type="button" class="btn" onclick="ajaxfunction1()">Add </button>
+    <button type="button" class="btn cancel" onclick="closeForm1()">Close</button>
+  </form>
+</div>
+
+{% endblock %}

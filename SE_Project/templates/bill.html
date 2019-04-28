@@ -1,0 +1,218 @@
+{% extends 'base1.html'%}
+
+{% block content %}
+<script>
+ function searchFunction()
+{
+  var input, filter, table, tr, td, i, txtValue;
+  /*validating data entry*/
+  input = document.getElementById("myInput");
+  filter = input.value.toUpperCase();
+
+  table = document.getElementById("myTable");
+  tr = table.getElementsByTagName("tr");
+
+  for (i = 0; i < tr.length; i++)
+  {
+    td = tr[i].getElementsByTagName("td")[0];
+    if (td)
+    {
+      txtValue = td.innerText;
+      if (txtValue.toUpperCase().indexOf(filter) > -1)
+      {
+        tr[i].style.display = "";
+      }
+      else
+      {
+        tr[i].style.display = "none";
+      }
+    }
+  }
+}
+var bill_row_count=1;
+
+
+function price_calculator(mid,rid,tablets){
+
+price = document.getElementById(mid+'_price').innerText;
+int_price = parseInt(price,10);
+document.getElementById(rid+'_bill_price').innerHTML=int_price*tablets;
+}
+
+function ajaxfucntion(){
+
+var med_name = [];
+var med_tablets = []
+
+var customer_name = document.getElementById('c_name').value;
+
+var customer_phone = document.getElementById('phone').value;
+
+
+var i;
+for (i = 1; i < bill_row_count; i++) {
+    med_name.push(document.getElementById(i+'_bill_name').textContent);
+    med_tablets.push(document.getElementById(i+'_bill_tablet').value);
+}
+
+$.ajax({
+            method: 'GET',
+            url: '{% url "Inventory:addbillView" %}',
+            data: {
+                names: JSON.stringify(med_name),
+                tab_counts:JSON.stringify(med_tablets),
+                customer_name:customer_name,
+
+                customer_phone:customer_phone,
+
+            },
+            dataType : 'json',
+            success:function(g){
+            alert(g.message);
+            window.location.href="{% url 'Inventory:billView' user.username%}";
+            }
+        });
+
+}
+
+
+
+function hiderow(id){
+    mid=id;
+    current_row_number = bill_row_count;
+    document.getElementById(id).style.display = "none";
+    name = document.getElementById(id+'_name');
+    price = document.getElementById(id+'_price');
+    tablebody = document.getElementById("billbody");
+    tablerow = document.createElement('tr');
+    name_td = document.createElement('td');
+    name_td.setAttribute('id',bill_row_count+'_bill_name');
+    name_td.append(document.getElementById(id+'_name').innerText);
+    <!--leaf_td = document.createElement('td');-->
+    <!--leaf_input = document.createElement('input');-->
+    <!--leaf_input.setAttribute('id',bill_row_count+'_bill_leaf');-->
+    <!--leaf_td.appendChild(leaf_input);-->
+
+    tablet_td = document.createElement('td');
+    tablet_input = document.createElement('input');
+    tablet_input.setAttribute('id',bill_row_count+'_bill_tablet');
+    tablet_input.setAttribute('type','number');
+    tablet_input.setAttribute('min','1');
+    tablet_input.setAttribute('onChange','price_calculator(mid,current_row_number,this.value)');
+    tablet_td.appendChild(tablet_input);
+
+    price_td = document.createElement('td');
+    price_td.setAttribute('id',bill_row_count+'_bill_price');
+
+
+
+
+    tablerow.appendChild(name_td);
+    <!--tablerow.appendChild(leaf_td);-->
+    tablerow.appendChild(tablet_td);
+    tablerow.appendChild(price_td);
+    tablebody.appendChild(tablerow);
+    bill_row_count=bill_row_count+1;
+
+}
+
+</script>
+    <div>
+        <nav class="navbar navbar-light navbar-expand-md background-color=#6f17ff navigation-clean" style="background-color: #51A2D5">
+                        <div class="container"  ><a class="navbar-brand" href="#">Pharmax</a><button class="navbar-toggler" data-toggle="collapse" data-target="#navcol-1"><span class="sr-only">Toggle navigation</span><span class="navbar-toggler-icon"></span></button>
+              <div class="collapse navbar-collapse"
+                    id="navcol-1">
+                    {% if user.designation == 's'%}
+                     <ul class="nav navbar-nav ml-auto">
+                        <li class="nav-item" role="presentation"><a class="nav-link" href="{% url 'Inventory:inventoryView' user.username %}">Inventory</a></li>
+                        <li class="nav-item" role="presentation"><a class="nav-link" href="{% url 'Inventory:billView' user.username %} ">Bill</a></li>
+                        <li class="nav-item" role="presentation">
+                            <a class="nav-link" href="{%url 'Inventory:logoutView'%}">Log out</a></li>
+                    </ul>
+                    {%else %}
+
+                    <ul class="nav navbar-nav ml-auto">
+                        <li class="nav-item" role="presentation"><a class="nav-link" href="{% url 'Inventory:inventoryView' user.username %}">Inventory</a></li>
+                        <li class="nav-item" role="presentation"><a class="nav-link" href="{% url 'Inventory:transferView'  user.username %}">Request Transfer</a></li>
+                        <li class="nav-item" role="presentation"><a class="nav-link" href="{% url 'Inventory:requestlistView' user.username %}">Pending Requests</a></li>
+                        <li class="nav-item" role="presentation"><a class="nav-link" href="{% url 'Inventory:salesmenView' user.username %}">Sales Men</a></li>
+                        <li class="nav-item" role="presentation"><a class="nav-link" href="{% url 'Inventory:billView' user.username%}"> Generate Bill</a></li>
+                        <li class="nav-item" role="presentation"><a class="nav-link" href="{% url 'Inventory:medicineView' user.username %}">Medicine</a></li>
+                        <li class="nav-item" role="presentation"><a class="nav-link" href="{%url 'Inventory:logoutView'%}">Log out</a></li>
+                    </ul>
+                    {% endif %}
+                </div>
+            </div>
+        </nav>
+    </div>
+    <div class="container">
+        <div class="table-responsive" style="background-color:#7DBCDE;">
+            <table class="table" style="background-color: #7DBCDE">
+                <thead>
+                    <tr>
+                        <th>Med. Name</th>
+
+                        <!--<th>Avail. Qty</th>-->
+                        <!--<th>Syrup/Tablet</th>-->
+                        <!--<th># of Leafs</th>-->
+                        <th>Tablets</th>
+                        <th>total price</th>
+                    </tr>
+                </thead>
+                <tbody id="billbody">
+                </tbody>
+            </table>
+        </div>
+        <div class="table-responsive" style="margin-bottom:30px;background-color:#59e1ff;">
+            <form>
+                <label>Customer Name</label>
+                <input id="c_name" placeholder="Name" value=" ">
+                <label>Phone</label>
+                <input id="phone" placeholder="0000-0000000" value=" ">
+
+                <button class="btn btn-primary" onclick="ajaxfucntion()" type="button" style="margin-bottom:20px;">Submit</button>
+            </form>
+                    </div></div>
+    <div class="container" style="background-color:#ffffff;">
+        <div style="padding:12px 0px;"><input id="myInput" onkeyup="searchFunction()" type="search" placeholder="Search" style="margin:0px;background-color:rgb(255,255,255);padding:5px;"></div>
+        <div class="table-responsive m-auto" style="background-color:#1dff18;">
+<table class="table" id="myTable">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Location</th>
+                    <th>Syrup/Tablet</th>
+
+
+                    <th>Per Pakcet Leafs</th>
+                    <th>Per Leaf Tablet</th>
+                    <th>packets</th>
+                    <th>leaves</th>
+                    <th>Tablets</th>
+                    <th>Unit Price</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for inven in inventory %}
+                <tr class='clickable-row' id="{{inven.id}}">
+                    <td id="{{inven.id}}_name">{{inven.med_id.name}}</td>
+                    <td id="{{inven.id}}_location">{{inven.location}}</td>
+                    <td id="{{inven.id}}_category">{{inven.med_id.category}}</td>
+
+                    <td>{{inven.max_leaf_count}}</td>
+                    <td>{{inven.max_tablet_count}}</td>
+                    <td>{{inven.packet_count}}</td>
+                    <td>{{inven.leaf_count}}</td>
+                    <td>{{inven.tablet_count}}</td>
+                    <td id="{{inven.id}}_price">{{inven.med_id.price}}</td>
+                    <td style="padding:0px;font-size:32px;"><i class="icon ion-android-arrow-up" onclick="hiderow({{inven.id}})" ></i></td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+
+
+
+        </div>
+    </div>
+{% endblock %}

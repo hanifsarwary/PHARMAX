@@ -1,0 +1,301 @@
+{% extends 'base1.html'%}
+
+{% block content %}
+
+<style>
+body {font-family: Arial, Helvetica, sans-serif;}
+* {box-sizing: border-box;}
+
+/* Button used to open the contact form - fixed at the bottom of the page */
+.open-button {
+  background-color: #555;
+  color: Blue;
+  padding: 16px 20px;
+  border: none;
+  cursor: pointer;
+  opacity: 0.8;
+  position: fixed;
+  bottom: 23px;
+  right: 28px;
+  width: 280px;
+}
+
+/* The popup form - hidden by default */
+.form-popup {
+  display: none;
+  position: fixed;
+  bottom: 0;
+  right: 15px;
+  border: 3px solid #f1f1f1;
+  z-index: 9;
+}
+
+/* Add styles to the form container */
+.form-container {
+  max-width: 300px;
+  padding: 10px;
+  background-color: white;
+}
+
+/* Full-width input fields */
+.form-container input[type=text], .form-container input[type=password] {
+  width: 100%;
+  padding: 15px;
+  margin: 5px 0 22px 0;
+  border: none;
+  background: #f1f1f1;
+}
+
+/* When the inputs get focus, do something */
+.form-container input[type=text]:focus, .form-container input[type=password]:focus {
+  background-color: #ddd;
+  outline: none;
+}
+
+/* Set a style for the submit/login button */
+.form-container .btn {
+  background-color: #4CAF50;
+  color: white;
+  padding: 16px 20px;
+  border: none;
+  cursor: pointer;
+  width: 100%;
+  margin-bottom:10px;
+  opacity: 0.8;
+}
+
+/* Add a red background color to the cancel button */
+.form-container .cancel {
+  background-color: red;
+}
+
+/* Add some hover effects to buttons */
+.form-container .btn:hover, .open-button:hover {
+  opacity: 1;
+}
+</style>
+<script>
+
+function openForm(name) {
+    document.getElementById("myForm").style.display = "block";
+    var s = document.getElementById("heading");
+    s.innerHTML = name;
+}
+
+function closeForm() {
+    document.getElementById("myForm").style.display = "none";
+}
+
+function openForm1() {
+    document.getElementById("myForm1").style.display = "block";
+
+}
+
+function closeForm1() {
+    document.getElementById("myForm1").style.display = "none";
+}
+
+
+function searchFunction()
+{
+  var input, filter, table, tr, td, i, txtValue;
+  /*validating data entry*/
+  input = document.getElementById("myInput");
+  filter = input.value.toUpperCase();
+
+  table = document.getElementById("myTable");
+  tr = table.getElementsByTagName("tr");
+
+  for (i = 0; i < tr.length; i++)
+  {
+    td = tr[i].getElementsByTagName("td")[0];
+    if (td)
+    {
+      txtValue = td.innerText;
+      if (txtValue.toUpperCase().indexOf(filter) > -1)
+      {
+        tr[i].style.display = "";
+      }
+      else
+      {
+        tr[i].style.display = "none";
+      }
+    }
+  }
+}
+
+
+function ajaxfunction(){
+var name = document.getElementById("heading");
+var price = document.getElementById("price");
+var pot = document.getElementById("pot");
+var cat = document.getElementById("cat");
+if(price.value>0 && pot.value>0){
+$.ajax({
+            method: 'GET',
+            url: '{% url "Inventory:medicineupdate" %}',
+            data: {
+                name: ''+name.innerHTML,
+                price:''+price.value,
+                pot:pot.value,
+                cat:''+cat.value,
+
+            },
+            dataType : 'json',
+            success:function(g){
+            alert('item is updated');
+            }
+        });
+   }
+   else{
+   alert("all numbers must be greater than 0");
+   }
+}
+
+
+function ajaxfunction1(){
+
+var name = document.getElementById("medname");
+var s_name = document.getElementById("s_name");
+var price = document.getElementById("price1");
+var pot = document.getElementById("pot1");
+var cat = document.getElementById("cat1");
+alert(name.value);
+if(name.value !=""){
+if(price.value>0 && pot.value>0){
+$.ajax({
+            method: 'POST',
+            url: '{% url "Inventory:medicineadd" %}',
+
+            data: {
+                name:''+name.value,
+                price:''+price.value,
+                pot:pot.value,
+                cat:''+cat.value,
+                s_name:''+s_name.value,
+                csrfmiddlewaretoken: '{{ csrf_token }}',
+
+            },
+
+
+            dataType : 'json',
+            success:function(g){
+            document.location.href="{%url 'Inventory:medicineView' user.username %}";
+            },
+            error:function(g){
+            document.location.href="{%url 'Inventory:medicineView' user.username %}";
+            }
+        });
+}
+else{
+alert("all number values should be greater than 0");
+}
+}
+
+else{
+alert("enter a valid name");
+}
+}
+
+</script>
+        <nav class="navbar navbar-light navbar-expand-md navigation-clean">
+            <div class="container"><a class="navbar-brand" href="#">Pharmax</a><button class="navbar-toggler" data-toggle="collapse" data-target="#navcol-1"><span class="sr-only">Toggle navigation</span><span class="navbar-toggler-icon"></span></button>
+     <div class="collapse navbar-collapse"
+                    id="navcol-1">
+                    {% if user.designation == 's'%}
+                     <ul class="nav navbar-nav ml-auto">
+                        <li class="nav-item" role="presentation"><a class="nav-link" href="{% url 'Inventory:inventoryView' user.username %}">Inventory</a></li>
+                        <li class="nav-item" role="presentation"><a class="nav-link" href="{% url 'Inventory:billView' user.username %} ">Bill</a></li>
+                        <li class="nav-item" role="presentation">
+                            <a class="nav-link" href="{%url 'Inventory:logoutView'%}">Log out</a></li>
+                    </ul>
+                    {%else %}
+
+                    <ul class="nav navbar-nav ml-auto">
+                        <li class="nav-item" role="presentation"><a class="nav-link" href="{% url 'Inventory:inventoryView' user.username %}">Inventory</a></li>
+                        <li class="nav-item" role="presentation"><a class="nav-link" href="{% url 'Inventory:transferView'  user.username %}">Request Transfer</a></li>
+                        <li class="nav-item" role="presentation"><a class="nav-link" href="{% url 'Inventory:requestlistView' user.username %}">Pending Requests</a></li>
+                        <li class="nav-item" role="presentation"><a class="nav-link" href="{% url 'Inventory:salesmenView' user.username %}">Sales Men</a></li>
+                        <li class="nav-item" role="presentation"><a class="nav-link" href="{% url 'Inventory:billView' user.username%}"> Generate Bill</a></li>
+                        <li class="nav-item" role="presentation"><a class="nav-link" href="{% url 'Inventory:medicineView' user.username %}">Medicine</a></li>
+                        <li class="nav-item" role="presentation"><a class="nav-link" href="{%url 'Inventory:logoutView'%}">Log out</a></li>
+                    </ul>
+                    {% endif %}
+                </div>
+            </div>
+        </nav><input id="myInput" onkeyup="searchFunction()"class="form-control-lg flex-grow-1" type="search" name="Search" placeholder="Search" maxlength="20" minlength="3" autofocus="" style="margin:12px;"></div>
+    <div class="table-responsive m-auto">
+        <table class="table" id="myTable">
+            <thead>
+                <tr>
+                    <th>Name</th>
+
+                    <th>Syrup/Tablet</th>
+
+                    <th>Mass</th>
+                    <th>Price</th>
+                    <th>Supplier</th>
+                    <th>Manufecturer</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for med in medicine %}
+                <tr class='clickable-row'>
+                    <td>{{med.name}}</td>
+                    <td>{{med.category}}</td>
+                    <td>{{med.potency}}</td>
+                    <td>{{med.price}}</td>
+                    <td>{{med.sid.name}}</td>
+                    <td>{{med.sid.manu_name}}</td>
+                    <<td><button class="btn btn-primary" onclick="openForm('{{med.name}}')" >update</button></td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+
+    </div>
+<input class="btn btn-primary" type="button" value="Add New Medicine" onclick="openForm1()">
+
+<div class="form-popup" id="myForm">
+  <form class="form-container">
+    <h1 id ="heading"></h1>
+
+    <label><b>Mass</b></label>
+    <input type="number" value="0" min="1" placeholder="Enter Potency" id="pot" >
+     <label><b>Price</b></label>
+    <input type="number" value="0" placeholder="Enter per tablet price" id="price">
+       <label><b>Category</b></label>
+    <input type="number" value="0" placeholder="Enter number of tablets in a leaf" id="cat">
+    <button type="button" class="btn" onclick="ajaxfunction()">Update</button>
+    <button type="button" class="btn cancel" onclick="closeForm()">Close</button>
+  </form>
+</div>
+
+
+<div class="form-popup" id="myForm1">
+  <form class="form-container">
+    {% csrf_token %}
+      <label>Supplier</label>
+    <select name="medicine" id="s_name">
+        {%for sup in supplier%}
+    <option value="{{sup.name}}">{{sup.name}}</option>
+        {%endfor%}
+    </select>
+    <label><b>Medicine Name</b></label>
+    <input type="text" placeholder="Enter medicine name" id="medname" required >
+    <label><b>Mass</b></label>
+    <input type="number"  value="0" placeholder="Enter Mass" id="pot1" >
+     <label><b>Price</b></label>
+    <input type="number" value="0" min="1" placeholder="Enter price" id="price1">
+       <label><b>Category</b></label>
+      <select id="cat1">
+          <option value="syr">Suyrup</option>
+          <option value="tab">Tablet</option>
+      </select>
+
+    <button type="button" class="btn" onclick="ajaxfunction1()">Add Medicine</button>
+    <button type="button" class="btn cancel" onclick="closeForm1()">Close</button>
+  </form>
+</div>
+
+{% endblock %}

@@ -1,0 +1,56 @@
+{% extends 'base1.html'%}
+
+{% block content %}
+    <div>
+        <nav class="navbar navbar-light navbar-expand-md navigation-clean">
+            <div class="container"><a class="navbar-brand" href="#">Pharmax</a><button class="navbar-toggler" data-toggle="collapse" data-target="#navcol-1"><span class="sr-only">Toggle navigation</span><span class="navbar-toggler-icon"></span></button>
+     <div class="collapse navbar-collapse"
+                    id="navcol-1">
+                    {% if user.designation == 's'%}
+                     <ul class="nav navbar-nav ml-auto">
+                        <li class="nav-item" role="presentation"><a class="nav-link" href="{% url 'Inventory:inventoryView' user.username %}">Inventory</a></li>
+                        <li class="nav-item" role="presentation"><a class="nav-link" href="{% url 'Inventory:billView' user.username %} ">Bill</a></li>
+                        <li class="nav-item" role="presentation">
+                            <a class="nav-link" href="{%url 'Inventory:logoutView'%}">Log out</a></li>
+                    </ul>
+                    {%else %}
+
+                    <ul class="nav navbar-nav ml-auto">
+                        <li class="nav-item" role="presentation"><a class="nav-link" href="{% url 'Inventory:inventoryView' user.username %}">Inventory</a></li>
+                        <li class="nav-item" role="presentation"><a class="nav-link" href="{% url 'Inventory:transferView'  user.username %}">Request Transfer</a></li>
+                        <li class="nav-item" role="presentation"><a class="nav-link" href="{% url 'Inventory:requestlistView' user.username %}">Pending Requests</a></li>
+                        <li class="nav-item" role="presentation"><a class="nav-link" href="{% url 'Inventory:salesmenView' user.username %}">Sales Men</a></li>
+                        <li class="nav-item" role="presentation"><a class="nav-link" href="{% url 'Inventory:billView' user.username%}"> Generate Bill</a></li>
+                        <li class="nav-item" role="presentation"><a class="nav-link" href="{% url 'Inventory:medicineView' user.username %}">Medicine</a></li>
+                        <li class="nav-item" role="presentation"><a class="nav-link" href="{%url 'Inventory:logoutView'%}">Log out</a></li>
+                    </ul>
+                    {% endif %}
+                </div>
+            </div>
+        </nav><input class="form-control-lg flex-grow-1" type="search" name="Search" placeholder="Search" maxlength="20" minlength="3" autofocus="" style="margin:12px;"></div>
+    <div class="table-responsive m-auto">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Medicine Name</th>
+                    <th>Tablets</th>
+                    <th>Price</th>
+                    <th style="width:188px;"># of packets/Bottle</th>
+
+                </tr>
+            </thead>
+            <tbody>
+
+                <tr>
+                    {% for inven in details %}
+                    <td>{{inven.mid.name}}</td>
+                    <td>{{inven.quantity}}</td>
+
+
+                    {% endfor %}
+                </tr>
+
+            </tbody>
+        </table>
+    </div>
+{% endblock %}
