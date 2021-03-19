@@ -40,7 +40,7 @@ django-rosetta==0.8.1
 django-tagging==0.4.6
 django-twilio==0.9.0
 django-xmlrpc==0.1.8
-djangorestframework==3.8.2
+djangorestframework==3.11.2
 docutils==0.14
 flake8==3.5.0
 future==0.16.0
