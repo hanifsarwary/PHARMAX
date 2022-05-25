@@ -73,7 +73,7 @@ pycparser==2.18
 pycryptodome==3.6.3
 pyflakes==1.6.0
 Pygments==2.2.0
-PyJWT==1.6.4
+PyJWT==2.4.0
 pyparsing==2.2.0
 PySocks==1.6.8
 pytest==3.6.3
