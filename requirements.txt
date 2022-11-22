@@ -61,7 +61,7 @@ packaging==17.1
 pbr==4.2.0
 pefile==2018.8.8
 phonenumberslite==8.9.9
-Pillow==5.2.0
+Pillow==9.3.0
 pinax-comments==1.0.3
 pinax-notifications==5.0.3
 pipenv==2018.7.1
